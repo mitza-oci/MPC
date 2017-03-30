@@ -1,6 +1,12 @@
-project : glib {
-  requires      += wireshark
+feature(!wireshark, !wireshark2) {
+  avoids += wireshark_not_configured
+}
 
+feature(wireshark, wireshark2) {
+  avoids += wireshark_configuration_invalid
+}
+
+feature(wireshark): glib {
   // Unfortunately Wireshark does not install headers for plugin
   // development; instead we rely on the source distribution:
   includes      += $(WIRESHARK_SRC)
@@ -39,5 +45,12 @@ project : glib {
   } else {
     libpaths    += $(WIRESHARK_SRC)/wiretap/.libs $(WIRESHARK_SRC)/epan/.libs
     lit_libs    += wiretap wireshark
+  }
+}
+
+feature(wireshark2): glib {
+  includes += $(WIRESHARK_SRC) $(WIRESHARK_BUILD)
+  specific(prop:microsoft) {
+    macros += _SSIZE_T_DEFINED
   }
 }
